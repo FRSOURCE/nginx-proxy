@@ -1,0 +1,23 @@
+name: Run nginx-proxy on VPS server
+on:
+  push:
+    branches:
+      - main
+  workflow_call:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-ssh
+        with:
+          HOST: ${{ secrets.FRSCHOOL_SSH_HOST }}
+          PRIVATE_KEY: ${{ secrets.FRSCHOOL_SSH_PRIVATE_KEY }}
+          PUBLIC_KEY: ${{ secrets.FRSCHOOL_SSH_HOST_KEY }}
+      - run: |
+          docker context create remote --docker "host=ssh://${{ secrets.FRSCHOOL_SSH_HOST }}:22"
+          docker context use remote
+      - run: docker compose -p nginx-proxy -f docker-compose.yml build
+      - run: docker compose -p nginx-proxy -f docker-compose.yml up -d

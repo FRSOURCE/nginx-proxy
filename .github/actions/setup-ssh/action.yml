@@ -1,0 +1,32 @@
+name: Configure SSH
+description: Configures ssh for connection with VPS server (e.g. sets up private keys)
+inputs:
+  HOST:
+    description: 'Host address, e.g.: 23.124.123.353'
+    required: true
+  PRIVATE_KEY:
+    description: 'Private ssh key'
+    required: true
+  PUBLIC_KEY:
+    description: 'Public ssh key'
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Install SSH key
+      run: |
+        eval $(ssh-agent)
+        mkdir -p ~/.ssh
+
+        cat >> ~/.ssh/config << EOF
+        Host ${{ inputs.HOST }}
+          HostName ${{ inputs.HOST }}
+          User root
+          IdentityFile ~/.ssh/${{ inputs.HOST }}
+        EOF
+
+        echo "${{ inputs.PRIVATE_KEY }}" > ~/.ssh/${{ inputs.HOST }}
+        chmod 600 ~/.ssh/${{ inputs.HOST }}
+        ssh-add ~/.ssh/${{ inputs.HOST }}
+        echo "${{ inputs.PUBLIC_KEY }}" >> ~/.ssh/known_hosts
+      shell: bash
