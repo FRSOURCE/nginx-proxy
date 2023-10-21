@@ -1,0 +1,14 @@
+name: Setup SSH docker context
+description: Configures & enables ssh docker context for connection with VPS server
+inputs:
+  HOST:
+    description: 'Host address, e.g.: 23.124.123.353'
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: create SSH docker context
+      run: |
+        docker context create remote --docker "host=ssh://${{ inputs.HOST }}:22"
+        docker context use remote
+      shell: bash

@@ -1,0 +1,30 @@
+name: Run nginx-proxy on VPS server
+on:
+  push:
+    branches:
+      - main
+  workflow_call:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-ssh
+        with:
+          HOST: ${{ secrets.FRSCHOOL_SSH_HOST }}
+          PRIVATE_KEY: ${{ secrets.FRSCHOOL_SSH_PRIVATE_KEY }}
+      - uses: ./.github/actions/setup-ssh-docker-context
+        with:
+          HOST: ${{ secrets.FRSCHOOL_SSH_HOST }}
+      - run: docker compose -p nginx-proxy -f docker-compose.yml build
+        env:
+          ZEROSSL_API_KEY: ${{ secrets.ZEROSSL_API_KEY }}
+          ACME_EAB_KID: ${{ secrets.ACME_EAB_KID }}
+          ACME_EAB_HMAC_KEY: ${{ secrets.ACME_EAB_HMAC_KEY }}
+      - run: docker compose -p nginx-proxy -f docker-compose.yml up -d
+        env:
+          ZEROSSL_API_KEY: ${{ secrets.ZEROSSL_API_KEY }}
+          ACME_EAB_KID: ${{ secrets.ACME_EAB_KID }}
+          ACME_EAB_HMAC_KEY: ${{ secrets.ACME_EAB_HMAC_KEY }}
