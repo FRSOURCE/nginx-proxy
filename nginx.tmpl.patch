@@ -1,0 +1,20 @@
+--- nginx.tmpl	2024-02-25 02:11:06
++++ nginx.new.tmpl	2024-02-25 02:51:32
+@@ -275,6 +275,16 @@
+         {{- else }}
+         proxy_pass {{ trim .Proto }}://{{ trim .Upstream }}{{ trim .Dest }};
+         set $upstream_keepalive {{ if ne $keepalive "disabled" }}true{{ else }}false{{ end }};
++        location ~ \.(?:ico|css|js|json|gif|svg|jpe?g|png|webp|woff|woff2)$ {
++            proxy_pass {{ trim .Proto }}://{{ trim .Upstream }}{{ trim .Dest }};
++            set $upstream_keepalive {{ if ne $keepalive "disabled" }}true{{ else }}false{{ end }};
++            proxy_hide_header Cache-Control;
++            proxy_hide_header Pragma;
++            proxy_hide_header Expires;
++            expires 24h;
++            add_header Pragma public;
++            add_header Cache-Control "public";
++        }
+         {{- end }}
+ 
+         {{- if (exists (printf "/etc/nginx/htpasswd/%s_%s" .Host (sha1 .Path) )) }}
+\ No newline at end of file
