@@ -26,7 +26,7 @@ services:
 
   acme-companion:
     # for SSL certificates generation
-    image: nginxproxy/acme-companion:2.2.10
+    image: nginxproxy/acme-companion:2.3.0
     container_name: nginx-proxy-acme
     environment:
       DEFAULT_EMAIL: letsencrypt@frsource.org
