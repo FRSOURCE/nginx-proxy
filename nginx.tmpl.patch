@@ -1,11 +1,11 @@
---- nginx.tmpl	2024-02-25 02:11:06
-+++ nginx.new.tmpl	2024-02-25 02:51:32
-@@ -275,6 +275,16 @@
+--- nginx.tmpl	2025-05-12 00:00:00
++++ nginx.new.tmpl	2025-05-12 00:00:00
+@@ -330,6 +330,16 @@
          {{- else }}
-         proxy_pass {{ trim .Proto }}://{{ trim .Upstream }}{{ trim .Dest }};
+         proxy_pass {{ trim $proto }}://{{ trim $upstream }}{{ trim $dest }};
          set $upstream_keepalive {{ if ne $keepalive "disabled" }}true{{ else }}false{{ end }};
 +        location ~ \.(?:ico|css|js|json|gif|svg|jpe?g|png|webp|woff|woff2)$ {
-+            proxy_pass {{ trim .Proto }}://{{ trim .Upstream }}{{ trimSuffix "/" (trim .Dest) }};
++            proxy_pass {{ trim $proto }}://{{ trim $upstream }}{{ trimSuffix "/" (trim $dest) }};
 +            set $upstream_keepalive {{ if ne $keepalive "disabled" }}true{{ else }}false{{ end }};
 +            proxy_hide_header Cache-Control;
 +            proxy_hide_header Pragma;
@@ -15,6 +15,5 @@
 +            add_header Cache-Control "public";
 +        }
          {{- end }}
- 
+
          {{- if (exists (printf "/etc/nginx/htpasswd/%s_%s" .Host (sha1 .Path) )) }}
-\ No newline at end of file
